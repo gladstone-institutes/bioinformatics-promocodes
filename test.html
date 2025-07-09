@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page - Bioinformatics Promo Codes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Test Page</h1>
+            <p>Testing functionality</p>
+        </header>
+        
+        <main>
+            <div class="form-container">
+                <h2>Debug Information</h2>
+                <div id="debug-info"></div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Simple test to verify the setup
+        document.addEventListener('DOMContentLoaded', () => {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.innerHTML = `
+                <p><strong>Status:</strong> ✅ Page loaded successfully</p>
+                <p><strong>CSS:</strong> ✅ Styles applied</p>
+                <p><strong>JavaScript:</strong> ✅ Scripts loaded</p>
+                <p><strong>Environment:</strong> ${window.location.hostname}</p>
+            `;
+        });
+    </script>
+</body>
+</html> 
