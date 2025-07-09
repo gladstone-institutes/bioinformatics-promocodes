@@ -221,6 +221,7 @@ class PromoCodeManager {
             promoCode = '';
             registrationUrl = this.currentEvent["General URL"] || '';
         }
+        console.log('[DEBUG] sendEmail: category:', category, 'promoCode:', promoCode, 'registrationUrl:', registrationUrl, 'event:', this.currentEvent);
 
         // Prepare template parameters
         const templateParams = {
@@ -277,6 +278,7 @@ class PromoCodeManager {
                 promoCode = '';
                 registrationUrl = this.currentEvent["General URL"] || '';
             }
+            console.log('[DEBUG] logRequest: category:', category, 'promoCode:', promoCode, 'registrationUrl:', registrationUrl, 'event:', this.currentEvent);
 
             const logData = {
                 email: email,
@@ -296,6 +298,7 @@ class PromoCodeManager {
             });
             
             const result = await response.json();
+            console.log('[DEBUG] logRequest: fetch result:', result);
             if (result.status === 'success') {
                 debug('Request logged successfully');
             } else {
@@ -303,6 +306,7 @@ class PromoCodeManager {
             }
         } catch (error) {
             debug('Error logging request', error);
+            console.error('[DEBUG] logRequest error:', error);
             // Don't show error to user for logging failures
         }
     }
