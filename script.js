@@ -213,10 +213,10 @@ class PromoCodeManager {
         let registrationUrl = '';
         if (category === 'edu') {
             promoCode = this.currentEvent["EDU code"] || '';
-            registrationUrl = this.currentEvent["EDU URL"] || this.currentEvent["General URL"] || '';
+            registrationUrl = (this.currentEvent["EDU URL"] && this.currentEvent["EDU URL"].trim() !== '') ? this.currentEvent["EDU URL"] : (this.currentEvent["General URL"] || '');
         } else if (category === 'partner') {
             promoCode = this.currentEvent["Partner code"] || '';
-            registrationUrl = this.currentEvent["Partner URL"] || this.currentEvent["General URL"] || '';
+            registrationUrl = (this.currentEvent["Partner URL"] && this.currentEvent["Partner URL"].trim() !== '') ? this.currentEvent["Partner URL"] : (this.currentEvent["General URL"] || '');
         } else {
             promoCode = '';
             registrationUrl = this.currentEvent["General URL"] || '';
@@ -263,13 +263,29 @@ class PromoCodeManager {
         }
         
         try {
+            // Use the same logic as sendEmail for promo code and registration URL
+            const category = this.getAffiliationCategory(affiliation);
+            let promoCode = '';
+            let registrationUrl = '';
+            if (category === 'edu') {
+                promoCode = this.currentEvent["EDU code"] || '';
+                registrationUrl = (this.currentEvent["EDU URL"] && this.currentEvent["EDU URL"].trim() !== '') ? this.currentEvent["EDU URL"] : (this.currentEvent["General URL"] || '');
+            } else if (category === 'partner') {
+                promoCode = this.currentEvent["Partner code"] || '';
+                registrationUrl = (this.currentEvent["Partner URL"] && this.currentEvent["Partner URL"].trim() !== '') ? this.currentEvent["Partner URL"] : (this.currentEvent["General URL"] || '');
+            } else {
+                promoCode = '';
+                registrationUrl = this.currentEvent["General URL"] || '';
+            }
+
             const logData = {
                 email: email,
                 affiliation: affiliation,
-                eventId: this.currentEvent.id,
-                eventTitle: this.currentEvent.title,
-                promoCode: this.currentEvent.promoCode
+                eventTitle: this.currentEvent["Title"] || '',
+                promoCode: promoCode,
+                registrationUrl: registrationUrl
             };
+            debug('Log data being sent:', logData);
             
             const response = await fetch(scriptUrl, {
                 method: 'POST',
