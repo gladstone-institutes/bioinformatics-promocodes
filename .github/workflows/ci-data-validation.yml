@@ -5,10 +5,12 @@ on:
     paths:
       - 'affiliations.txt'
       - '**/google-apps-script.js'
+      - 'events.csv'
   push:
     paths:
       - 'affiliations.txt'
       - '**/google-apps-script.js'
+      - 'events.csv'
 
 jobs:
   validate-affiliations:
@@ -39,8 +41,6 @@ with open('affiliations.txt') as f:
 print('affiliations.txt is valid.')
 """
 
-  # Optionally, add a job to validate a CSV export of the Events sheet if available in the repo
-  # To enable, uncomment and adjust the following job:
   validate-events-sheet:
     runs-on: ubuntu-latest
     steps:
@@ -49,18 +49,18 @@ print('affiliations.txt is valid.')
       - name: Validate Events sheet CSV
         run: |
           python3 -c """
-  import csv
-  required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
-  with open('events.csv') as f:
-      reader = csv.DictReader(f)
-      missing = required_columns - set(reader.fieldnames)
-      if missing:
-          print(f'Missing columns: {missing}')
-          exit(1)
-      for i, row in enumerate(reader, 2):
-          for col in required_columns:
-              if not row.get(col):
-                  print(f'Missing value in row {i}, column {col}')
-                  exit(1)
-  print('Events sheet CSV is valid.')
-  """ 
+import csv
+required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
+with open('events.csv') as f:
+    reader = csv.DictReader(f)
+    missing = required_columns - set(reader.fieldnames)
+    if missing:
+        print(f'Missing columns: {missing}')
+        exit(1)
+    for i, row in enumerate(reader, 2):
+        for col in required_columns:
+            if not row.get(col):
+                print(f'Missing value in row {i}, column {col}')
+                exit(1)
+print('Events sheet CSV is valid.')
+""" 
