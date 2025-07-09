@@ -1,0 +1,66 @@
+name: CI Data Validation
+
+on:
+  pull_request:
+    paths:
+      - 'affiliations.txt'
+      - '**/google-apps-script.js'
+  push:
+    paths:
+      - 'affiliations.txt'
+      - '**/google-apps-script.js'
+
+jobs:
+  validate-affiliations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate affiliations.txt structure and categories
+        run: |
+          python3 -c """
+import sys
+valid_categories = {'edu', 'partner', 'default'}
+with open('affiliations.txt') as f:
+    lines = [l.strip() for l in f if l.strip() and not l.startswith('#')]
+    for i, line in enumerate(lines, 1):
+        parts = [p.strip() for p in line.split('|')]
+        if len(parts) != 3:
+            print(f'Error: Line {i} does not have 3 fields: {line}')
+            sys.exit(1)
+        aff, msg, cat = parts
+        if not aff or not msg or not cat:
+            print(f'Error: Line {i} has empty fields: {line}')
+            sys.exit(1)
+        if cat not in valid_categories:
+            print(f'Error: Line {i} has invalid category: {cat}')
+            sys.exit(1)
+print('affiliations.txt is valid.')
+"""
+
+  # Optionally, add a job to validate a CSV export of the Events sheet if available in the repo
+  # To enable, uncomment and adjust the following job:
+  # validate-events-sheet:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Validate Events sheet CSV
+  #       run: |
+  #         python3 -c """
+  import csv
+  required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
+  with open('events.csv') as f:
+      reader = csv.DictReader(f)
+      missing = required_columns - set(reader.fieldnames)
+      if missing:
+          print(f'Missing columns: {missing}')
+          exit(1)
+      for i, row in enumerate(reader, 2):
+          for col in required_columns:
+              if not row.get(col):
+                  print(f'Missing value in row {i}, column {col}')
+                  exit(1)
+  print('Events sheet CSV is valid.')
+  """ 

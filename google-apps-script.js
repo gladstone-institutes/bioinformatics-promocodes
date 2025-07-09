@@ -33,8 +33,8 @@ function getEventsData() {
             return [];
         }
         // Read from row 2 (headers) to last non-empty row, columns A-J
-        const data = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
-        Logger.log('Data range: row 2, col 1, numRows: ' + (lastRow - 1) + ', numCols: 10');
+        const data = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
+        Logger.log('Data range: row 2, col 1, numRows: ' + (lastRow - 1) + ', numCols: 11');
         Logger.log('Raw data: ' + JSON.stringify(data));
         if (data.length === 0) {
             Logger.log('No data rows found.');
