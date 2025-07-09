@@ -19,6 +19,10 @@ class PromoCodeManager {
     constructor() {
         this.events = [];
         this.currentEvent = null;
+
+        // Enhanced debugging: print config at startup
+        console.log('[DEBUG] window.APP_CONFIG:', window.APP_CONFIG);
+
         this.init();
     }
 
@@ -31,29 +35,41 @@ class PromoCodeManager {
     async loadEvents() {
         try {
             debug('Loading events from Google Apps Script');
-            
-            // Use injected config from GitHub secrets
+
+            // Enhanced debugging: print Apps Script URL
             const scriptUrl = window.APP_CONFIG?.GOOGLE_SHEETS?.APPS_SCRIPT_URL;
-            
+            console.log('[DEBUG] Apps Script URL:', scriptUrl);
+
             if (!scriptUrl || scriptUrl === 'YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_URL') {
+                console.error('[DEBUG] Google Apps Script URL not configured or is placeholder:', scriptUrl);
                 throw new Error('Google Apps Script URL not configured');
             }
-            
-            // Load from Google Apps Script
+
+            // Enhanced debugging: print fetch attempt
+            console.log('[DEBUG] Fetching events from:', scriptUrl);
             const response = await fetch(scriptUrl);
+
+            // Enhanced debugging: print response status
+            console.log('[DEBUG] Fetch response status:', response.status);
+
             const result = await response.json();
-            
+
+            // Enhanced debugging: print response body
+            console.log('[DEBUG] Fetch response body:', result);
+
             if (result.status === 'success') {
                 this.events = result.data;
                 debug('Events loaded from Apps Script', this.events.length);
             } else {
+                console.error('[DEBUG] Failed to load events from Apps Script:', result);
                 throw new Error('Failed to load events from Apps Script');
             }
-            
+
             this.populateEventSelect();
             debug('Events loaded successfully', this.events.length);
         } catch (error) {
             debug('Error loading events', error);
+            console.error('[DEBUG] Error loading events:', error);
             this.showError('Failed to load events. Please check configuration.');
         }
     }
