@@ -15,12 +15,14 @@ const EMAIL_CONFIG = {
     apiKey: 'YOUR_EMAILJS_API_KEY'
 };
 
+console.log('SCRIPT LOADED'); // Confirm script is running
+
 class PromoCodeManager {
     constructor() {
         this.events = [];
         this.currentEvent = null;
 
-        // Enhanced debugging: print config at startup
+        // Always print config at startup for debugging
         console.log('[DEBUG] window.APP_CONFIG:', window.APP_CONFIG);
 
         this.init();
@@ -36,7 +38,7 @@ class PromoCodeManager {
         try {
             debug('Loading events from Google Apps Script');
 
-            // Enhanced debugging: print Apps Script URL
+            // Always print Apps Script URL for debugging
             const scriptUrl = window.APP_CONFIG?.GOOGLE_SHEETS?.APPS_SCRIPT_URL;
             console.log('[DEBUG] Apps Script URL:', scriptUrl);
 
@@ -45,16 +47,16 @@ class PromoCodeManager {
                 throw new Error('Google Apps Script URL not configured');
             }
 
-            // Enhanced debugging: print fetch attempt
+            // Always print fetch attempt
             console.log('[DEBUG] Fetching events from:', scriptUrl);
             const response = await fetch(scriptUrl);
 
-            // Enhanced debugging: print response status
+            // Always print response status
             console.log('[DEBUG] Fetch response status:', response.status);
 
             const result = await response.json();
 
-            // Enhanced debugging: print response body
+            // Always print response body
             console.log('[DEBUG] Fetch response body:', result);
 
             if (result.status === 'success') {
