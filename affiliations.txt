@@ -1,0 +1,8 @@
+# affiliation | message | category
+academic|As an academic participant, you're eligible for our special academic discount.|edu
+industry|We're excited to have industry professionals join our workshop. Your promo code provides access to our comprehensive industry track.|default
+government|Government participants are welcome! Your promo code includes access to our government-specific resources and networking opportunities.|default
+nonprofit|Non-profit organizations are important to our community. Your promo code includes additional resources for non-profit capacity building.|default
+student|Students are the future of bioinformatics! Your promo code includes access to student-specific resources and mentoring opportunities.|edu
+other|We're glad to have you join our diverse community of learners. Your promo code provides full access to all workshop materials and resources.|default
+partner|Thank you for partnering with us! Your promo code provides access to partner benefits.|partner 

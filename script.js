@@ -21,20 +21,54 @@ class PromoCodeManager {
     constructor() {
         this.events = [];
         this.currentEvent = null;
-
-        // Always print config at startup for debugging
-        console.log('[DEBUG] window.APP_CONFIG:', window.APP_CONFIG);
-
+        this.affiliations = {};
         this.init();
     }
 
     async init() {
-        debug('Initializing PromoCodeManager');
+        await this.loadAffiliations();
         await this.loadEvents();
         this.setupEventListeners();
     }
 
+    async loadAffiliations() {
+        try {
+            const response = await fetch('affiliations.txt');
+            const text = await response.text();
+            this.affiliations = this.parseAffiliations(text);
+            this.populateAffiliationSelect();
+        } catch (error) {
+            console.error('[DEBUG] Failed to load affiliations.txt:', error);
+            this.affiliations = {};
+        }
+    }
+
+    parseAffiliations(text) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+        const map = {};
+        lines.forEach(line => {
+            const [affiliation, message, category] = line.split('|').map(s => s.trim());
+            map[affiliation] = { message, category };
+        });
+        return map;
+    }
+
+    populateAffiliationSelect() {
+        const select = document.getElementById('affiliation');
+        select.innerHTML = '<option value="">Select your affiliation...</option>';
+        Object.keys(this.affiliations).forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+            select.appendChild(option);
+        });
+    }
+
     async loadEvents() {
+        const select = document.getElementById('eventSelect');
+        // Show loading state
+        select.innerHTML = '<option>Loading events...</option>';
+        select.disabled = true;
         try {
             debug('Loading events from Google Apps Script');
 
@@ -79,12 +113,14 @@ class PromoCodeManager {
     populateEventSelect() {
         const select = document.getElementById('eventSelect');
         select.innerHTML = '<option value="">Choose an event...</option>';
-        
+        select.disabled = false;
         this.events.forEach((event, idx) => {
             const option = document.createElement('option');
             // Use EDU code as a unique value if available, otherwise fallback to index
             option.value = event["EDU code"] || event["Title"] || idx;
-            option.textContent = `${event["Title"] || "Untitled Event"}`;
+            // Show Title (Date) in the dropdown
+            const dateStr = event["Date"] ? ` (${event["Date"]})` : '';
+            option.textContent = `${event["Title"] || "Untitled Event"}${dateStr}`;
             select.appendChild(option);
         });
     }
@@ -170,12 +206,27 @@ class PromoCodeManager {
         
         // Initialize EmailJS
         emailjs.init(apiKey);
-        
+
+        // Determine promo code and registration URL based on affiliation category
+        const category = this.getAffiliationCategory(affiliation);
+        let promoCode = '';
+        let registrationUrl = '';
+        if (category === 'edu') {
+            promoCode = this.currentEvent["EDU code"] || '';
+            registrationUrl = this.currentEvent["EDU URL"] || this.currentEvent["General URL"] || '';
+        } else if (category === 'partner') {
+            promoCode = this.currentEvent["Partner code"] || '';
+            registrationUrl = this.currentEvent["Partner URL"] || this.currentEvent["General URL"] || '';
+        } else {
+            promoCode = '';
+            registrationUrl = this.currentEvent["General URL"] || '';
+        }
+
         // Prepare template parameters
         const templateParams = {
-            event_title: this.currentEvent.title,
-            promo_code: this.currentEvent.promoCode,
-            registration_url: this.currentEvent.registrationUrl,
+            event_title: this.currentEvent["Title"] || '',
+            promo_code: promoCode,
+            registration_url: registrationUrl,
             affiliation_message: this.getAffiliationMessage(affiliation),
             to_email: email
         };
@@ -193,16 +244,11 @@ class PromoCodeManager {
     }
 
     getAffiliationMessage(affiliation) {
-        const messages = {
-            academic: "As an academic participant, you're eligible for our special academic discount. Use the promo code above to register at the discounted rate.",
-            industry: "We're excited to have industry professionals join our workshop. Your promo code provides access to our comprehensive industry track.",
-            government: "Government participants are welcome! Your promo code includes access to our government-specific resources and networking opportunities.",
-            nonprofit: "Non-profit organizations are important to our community. Your promo code includes additional resources for non-profit capacity building.",
-            student: "Students are the future of bioinformatics! Your promo code includes access to student-specific resources and mentoring opportunities.",
-            other: "We're glad to have you join our diverse community of learners. Your promo code provides full access to all workshop materials and resources."
-        };
-        
-        return messages[affiliation] || messages.other;
+        return this.affiliations[affiliation]?.message || this.affiliations['other']?.message || '';
+    }
+
+    getAffiliationCategory(affiliation) {
+        return this.affiliations[affiliation]?.category || 'default';
     }
 
     async logRequest(email, affiliation) {
