@@ -55,7 +55,7 @@ jobs:
               print('GOOGLE_SCRIPT_URL secret not configured - skipping live data validation')
               sys.exit(0)
           
-          required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
+          required_columns = ['Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL']
           
           try:
               # Fetch data from Apps Script
@@ -73,26 +73,24 @@ jobs:
               
               print(f'Found {len(events)} events')
               
-              # Check that all events have required columns
+              # Check that all events have all required columns with non-empty values
+              errors = []
               for i, event in enumerate(events, 1):
-                  missing = required_columns - set(event.keys())
-                  if missing:
-                      print(f'Event {i} missing columns: {missing}')
-                      sys.exit(1)
+                  event_title = event.get('Title', f'Event {i}')
                   
-                  # Check for required non-empty fields
-                  for col in ['Title', 'Date']:
-                      if not event.get(col):
-                          print(f'Event {i} has empty required field: {col}')
-                          sys.exit(1)
-                  
-                  # Check that at least one URL is provided
-                  urls = [event.get('General URL'), event.get('EDU URL'), event.get('Partner URL')]
-                  if not any(url for url in urls):
-                      print(f'Event {i} ({event.get("Title")}) has no registration URLs')
-                      sys.exit(1)
+                  for col in required_columns:
+                      if col not in event:
+                          errors.append(f'Event {i} ({event_title}): Missing column "{col}"')
+                      elif not event[col] or str(event[col]).strip() == '':
+                          errors.append(f'Event {i} ({event_title}): Empty value in column "{col}"')
               
-              print('Live Events data is valid.')
+              if errors:
+                  print('Validation failed:')
+                  for error in errors:
+                      print(f'  - {error}')
+                  sys.exit(1)
+              
+              print('Live Events data is valid - all 7 required columns have data for all events.')
           
           except Exception as e:
               print(f'Error fetching or validating events data: {e}')
