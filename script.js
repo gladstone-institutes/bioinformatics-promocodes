@@ -80,10 +80,11 @@ class PromoCodeManager {
         const select = document.getElementById('eventSelect');
         select.innerHTML = '<option value="">Choose an event...</option>';
         
-        this.events.forEach(event => {
+        this.events.forEach((event, idx) => {
             const option = document.createElement('option');
-            option.value = event.id;
-            option.textContent = `${event.title} - ${new Date(event.date).toLocaleDateString()}`;
+            // Use EDU code as a unique value if available, otherwise fallback to index
+            option.value = event["EDU code"] || event["Title"] || idx;
+            option.textContent = `${event["Title"] || "Untitled Event"}`;
             select.appendChild(option);
         });
     }
@@ -98,7 +99,8 @@ class PromoCodeManager {
 
     handleEventChange(event) {
         const eventId = event.target.value;
-        this.currentEvent = this.events.find(e => e.id === eventId);
+        // Find by EDU code or fallback to Title or index
+        this.currentEvent = this.events.find(e => e["EDU code"] === eventId || e["Title"] === eventId);
         debug('Event selected', this.currentEvent);
     }
 
