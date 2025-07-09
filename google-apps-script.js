@@ -27,12 +27,17 @@ function getEventsData() {
 
     try {
         const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
-        const data = sheet.getDataRange().getValues();
+        // Get only columns A-J and start from row 2 (headers)
+        const lastRow = sheet.getLastRow();
+        const dataRange = sheet.getRange(2, 1, lastRow - 1, 10); // row 2, col 1 (A), numRows, 10 cols (A-J)
+        const data = dataRange.getValues();
         const headers = data[0];
         const events = [];
 
         for (let i = 1; i < data.length; i++) {
             const row = data[i];
+            // Skip empty rows
+            if (row.every(cell => cell === '' || cell === null)) continue;
             const event = {};
             headers.forEach((header, index) => {
                 event[header] = row[index];
