@@ -28,19 +28,26 @@ function getEventsData() {
     try {
         const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
         const lastRow = sheet.getLastRow();
+        const lastCol = sheet.getLastColumn();
+        
         if (lastRow < 2) {
             Logger.log('Sheet has less than 2 rows.');
             return [];
         }
-        // Read from row 2 (headers) to last non-empty row, columns A-J
-        const data = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
-        Logger.log('Data range: row 2, col 1, numRows: ' + (lastRow - 1) + ', numCols: 11');
+        
+        // Read from row 2 (headers) to last non-empty row, all columns dynamically
+        const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+        Logger.log('Data range: row 2, col 1, numRows: ' + (lastRow - 1) + ', numCols: ' + lastCol);
         Logger.log('Raw data: ' + JSON.stringify(data));
+        
         if (data.length === 0) {
             Logger.log('No data rows found.');
             return [];
         }
+        
         const headers = data[0];
+        Logger.log('Headers: ' + JSON.stringify(headers));
+        
         const events = [];
         for (let i = 1; i < data.length; i++) {
             const row = data[i];
