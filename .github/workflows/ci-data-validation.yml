@@ -2,15 +2,8 @@ name: CI Data Validation
 
 on:
   pull_request:
-    paths:
-      - 'affiliations.txt'
-      - '**/google-apps-script.js'
-      - 'events.csv'
   push:
-    paths:
-      - 'affiliations.txt'
-      - '**/google-apps-script.js'
-      - 'events.csv'
+  workflow_dispatch:
 
 jobs:
   validate-affiliations:
