@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure environment
+      run: |
+        # Create a temporary config file with secrets
+        cat > temp-config.js << EOF
+        window.APP_CONFIG = {
+          GOOGLE_SHEETS: {
+            APPS_SCRIPT_URL: '${{ secrets.GOOGLE_SCRIPT_URL }}'
+          },
+          EMAIL_SERVICE: {
+            SERVICE_ID: '${{ secrets.EMAILJS_SERVICE_ID }}',
+            TEMPLATE_ID: '${{ secrets.EMAILJS_TEMPLATE_ID }}',
+            API_KEY: '${{ secrets.EMAILJS_API_KEY }}'
+          },
+          APP: {
+            DEBUG: false,
+            MAX_REQUESTS_PER_HOUR: 10,
+            EMAIL_DOMAIN_WHITELIST: []
+          }
+        };
+        EOF
+        
+        # Replace the placeholder in script.js
+        sed -i "s|YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_URL|${{ secrets.GOOGLE_SCRIPT_URL }}|g" script.js
+        sed -i "s|YOUR_EMAILJS_SERVICE_ID|${{ secrets.EMAILJS_SERVICE_ID }}|g" script.js
+        sed -i "s|YOUR_EMAILJS_TEMPLATE_ID|${{ secrets.EMAILJS_TEMPLATE_ID }}|g" script.js
+        sed -i "s|YOUR_EMAILJS_API_KEY|${{ secrets.EMAILJS_API_KEY }}|g" script.js
+        
+        # Replace the config.js with the temp one
+        mv temp-config.js config.js
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./ 
