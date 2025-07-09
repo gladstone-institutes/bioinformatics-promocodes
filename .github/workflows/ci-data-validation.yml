@@ -41,14 +41,14 @@ print('affiliations.txt is valid.')
 
   # Optionally, add a job to validate a CSV export of the Events sheet if available in the repo
   # To enable, uncomment and adjust the following job:
-  # validate-events-sheet:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Validate Events sheet CSV
-  #       run: |
-  #         python3 -c """
+  validate-events-sheet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Validate Events sheet CSV
+        run: |
+          python3 -c """
   import csv
   required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
   with open('events.csv') as f:
