@@ -40,7 +40,6 @@ with open('affiliations.txt') as f:
             sys.exit(1)
 print('affiliations.txt is valid.')
 """
-
   validate-events-sheet:
     runs-on: ubuntu-latest
     steps:
