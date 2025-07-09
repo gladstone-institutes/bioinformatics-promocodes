@@ -15,45 +15,85 @@ jobs:
       - name: Validate affiliations.txt structure and categories
         run: |
           python3 << 'EOF'
-          import sys
-          valid_categories = {'edu', 'partner', 'default'}
-          with open('affiliations.txt') as f:
-              lines = [l.strip() for l in f if l.strip() and not l.startswith('#')]
-              for i, line in enumerate(lines, 1):
-                  parts = [p.strip() for p in line.split('|')]
-                  if len(parts) != 3:
-                      print(f'Error: Line {i} does not have 3 fields: {line}')
-                      sys.exit(1)
-                  aff, msg, cat = parts
-                  if not aff or not msg or not cat:
-                      print(f'Error: Line {i} has empty fields: {line}')
-                      sys.exit(1)
-                  if cat not in valid_categories:
-                      print(f'Error: Line {i} has invalid category: {cat}')
-                      sys.exit(1)
-          print('affiliations.txt is valid.')
-          EOF
+import sys
+valid_categories = {'edu', 'partner', 'default'}
+with open('affiliations.txt') as f:
+    lines = [l.strip() for l in f if l.strip() and not l.startswith('#')]
+    for i, line in enumerate(lines, 1):
+        parts = [p.strip() for p in line.split('|')]
+        if len(parts) != 3:
+            print(f'Error: Line {i} does not have 3 fields: {line}')
+            sys.exit(1)
+        aff, msg, cat = parts
+        if not aff or not msg or not cat:
+            print(f'Error: Line {i} has empty fields: {line}')
+            sys.exit(1)
+        if cat not in valid_categories:
+            print(f'Error: Line {i} has invalid category: {cat}')
+            sys.exit(1)
+print('affiliations.txt is valid.')
+EOF
 
-  validate-events-sheet:
+  validate-events-data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Validate Events sheet CSV
+      - name: Validate live Events data from Apps Script
+        env:
+          GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
         run: |
           python3 << 'EOF'
-          import csv
-          required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
-          with open('events.csv') as f:
-              reader = csv.DictReader(f)
-              missing = required_columns - set(reader.fieldnames)
-              if missing:
-                  print(f'Missing columns: {missing}')
-                  exit(1)
-              for i, row in enumerate(reader, 2):
-                  for col in required_columns:
-                      if not row.get(col):
-                          print(f'Missing value in row {i}, column {col}')
-                          exit(1)
-          print('Events sheet CSV is valid.')
-          EOF 
+import json
+import urllib.request
+import os
+import sys
+
+script_url = os.environ.get('GOOGLE_SCRIPT_URL')
+if not script_url:
+    print('GOOGLE_SCRIPT_URL secret not configured - skipping live data validation')
+    sys.exit(0)
+
+required_columns = {'Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'}
+
+try:
+    # Fetch data from Apps Script
+    with urllib.request.urlopen(script_url) as response:
+        data = json.loads(response.read())
+    
+    if data.get('status') != 'success':
+        print(f'Apps Script returned error: {data}')
+        sys.exit(1)
+    
+    events = data.get('data', [])
+    if not events:
+        print('No events found in Apps Script response')
+        sys.exit(1)
+    
+    print(f'Found {len(events)} events')
+    
+    # Check that all events have required columns
+    for i, event in enumerate(events, 1):
+        missing = required_columns - set(event.keys())
+        if missing:
+            print(f'Event {i} missing columns: {missing}')
+            sys.exit(1)
+        
+        # Check for required non-empty fields
+        for col in ['Title', 'Date']:
+            if not event.get(col):
+                print(f'Event {i} has empty required field: {col}')
+                sys.exit(1)
+        
+        # Check that at least one URL is provided
+        urls = [event.get('General URL'), event.get('EDU URL'), event.get('Partner URL')]
+        if not any(url for url in urls):
+            print(f'Event {i} ({event.get("Title")}) has no registration URLs')
+            sys.exit(1)
+    
+    print('Live Events data is valid.')
+
+except Exception as e:
+    print(f'Error fetching or validating events data: {e}')
+    sys.exit(1)
+EOF 
