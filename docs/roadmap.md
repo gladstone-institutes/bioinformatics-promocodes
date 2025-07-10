@@ -19,6 +19,7 @@
 - [x] Set up error handling for API calls
 - [x] Add data validation for sheet structure
 - [x] Configure Google Apps Script backend
+- [x] Fix column reading to capture all data dynamically
 
 ## Phase 3: Email Service Integration ✅
 - [x] Design EmailJS integration
@@ -39,6 +40,7 @@
 
 ## Phase 6: Testing & Deployment ✅
 - [x] Configure EmailJS and Google Apps Script
+- [x] Fix Partner URL column reading issue
 - [ ] Test full deployment workflow
 - [ ] Validate email delivery
 - [ ] Test request logging

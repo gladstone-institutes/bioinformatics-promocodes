@@ -107,6 +107,29 @@ Your repository should now have these secrets configured:
 2. Test the form with real data
 3. Check your Google Sheet's Logs tab for entries
 
+## Updating Google Apps Script
+
+When you make changes to the `google-apps-script.js` file in this repository, you need to manually update the deployed Google Apps Script:
+
+1. **Open Google Apps Script**: Go to [script.google.com](https://script.google.com)
+2. **Find your project**: Open the project you created during initial setup
+3. **Update the code**: Copy the updated code from `google-apps-script.js` and paste it into the Apps Script editor
+4. **Save and deploy**: 
+   - Click "Save" (Ctrl+S)
+   - Click "Deploy" → "Manage deployments"
+   - Click the edit icon (pencil) next to your existing deployment
+   - Change "Version" to "New version"
+   - Click "Deploy"
+5. **Test the changes**: The updated script should now be live at your deployment URL
+
+### Recent Critical Fix
+
+**Issue**: The Partner URL column was missing from event data because the script was hardcoded to read only 11 columns.
+
+**Solution**: Updated the script to use `getLastColumn()` to dynamically read all columns. This ensures all data is captured regardless of how many columns are in the sheet.
+
+**Required Action**: You must redeploy the updated `google-apps-script.js` code to fix this issue.
+
 ## Troubleshooting
 
 ### Common Issues:
