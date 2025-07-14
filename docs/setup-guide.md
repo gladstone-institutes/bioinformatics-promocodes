@@ -26,13 +26,14 @@ Event ID | Title                    | Date       | Promo Code | Registration URL
 ```
 
 ### 1.3 Set up Logs Tab
-Create a tab called "Logs" with these columns:
+Create a tab called "Logs". **Note: You don't need to add column headers manually** - the Google Apps Script will automatically add headers when the first log entry is created:
 - **A1**: Timestamp
 - **B1**: Email
 - **C1**: Affiliation
 - **D1**: Event ID
 - **E1**: Event Title
 - **F1**: Promo Code
+- **G1**: Registration URL
 
 ### 1.4 Get Spreadsheet ID
 1. Click "Share" in the top right
@@ -159,6 +160,32 @@ console.log(window.APP_CONFIG);
 - ✅ Apps Script URL is public but secure
 - ✅ EmailJS handles email security
 - ✅ All sensitive data stays in Google's ecosystem
+
+## Troubleshooting Logging Issues
+
+### If the Logs sheet is empty:
+
+1. **Check the sheet name**: Make sure you have a sheet named exactly "Logs" (case-sensitive)
+
+2. **Test logging manually**: Copy the debug script from `debug-logging.js` into your Google Apps Script and run `testLogging()`
+
+3. **Check Apps Script logs**: 
+   - Go to Google Apps Script > Executions
+   - Look for any error messages in the logs
+
+4. **Verify frontend is sending data**: Open browser console and look for debug messages like:
+   ```
+   [DEBUG] logRequest: category: edu promoCode: EDU50 registrationUrl: https://...
+   [DEBUG] Log data being sent: {email: "...", affiliation: "...", ...}
+   ```
+
+5. **Check network requests**: In browser DevTools > Network tab, look for POST requests to your Apps Script URL
+
+### Common issues:
+- **Missing "Logs" sheet**: Create it manually if it doesn't exist
+- **Wrong spreadsheet ID**: Verify the ID in your Apps Script matches your Google Sheet
+- **Apps Script not deployed**: Make sure you've deployed the script as a web app
+- **Permission issues**: Apps Script needs permission to write to the sheet
 
 ## Next Steps
 

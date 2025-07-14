@@ -72,17 +72,35 @@ function logRequest(requestData) {
 
     try {
         const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
+        
+        // Check if this is the first log entry and add headers if needed
+        if (sheet.getLastRow() === 0) {
+            const headers = [
+                'Timestamp',
+                'Email',
+                'Affiliation',
+                'Event ID',
+                'Event Title',
+                'Promo Code',
+                'Registration URL'
+            ];
+            sheet.appendRow(headers);
+        }
+        
         const timestamp = new Date().toISOString();
         const logRow = [
             timestamp,
-            requestData.email,
-            requestData.affiliation,
-            requestData.eventId,
-            requestData.eventTitle,
-            requestData.promoCode
+            requestData.email || '',
+            requestData.affiliation || '',
+            requestData.eventId || '',
+            requestData.eventTitle || '',
+            requestData.promoCode || '',
+            requestData.registrationUrl || ''
         ];
         sheet.appendRow(logRow);
+        Logger.log('Logged request: ' + JSON.stringify(logRow));
     } catch (error) {
+        Logger.log('Error logging request: ' + error);
         console.error('Error logging request:', error);
     }
 }

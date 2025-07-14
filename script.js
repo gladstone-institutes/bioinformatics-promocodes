@@ -318,6 +318,7 @@ class PromoCodeManager {
             const logData = {
                 email: email,
                 affiliation: affiliation,
+                eventId: this.currentEvent["EDU code"] || '',
                 eventTitle: this.currentEvent["Title"] || '',
                 promoCode: promoCode,
                 registrationUrl: registrationUrl
