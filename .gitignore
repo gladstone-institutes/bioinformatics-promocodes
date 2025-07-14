@@ -157,3 +157,6 @@ docs/build/
 # Local configuration overrides
 config.local.js
 script.local.js 
+
+# Cursor Chat Keeper
+cursor-chats/

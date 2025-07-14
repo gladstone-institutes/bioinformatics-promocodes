@@ -212,14 +212,14 @@ class PromoCodeManager {
         let promoCode = '';
         let registrationUrl = '';
         if (category === 'edu') {
-            promoCode = this.currentEvent["EDU code"] || '';
-            registrationUrl = (this.currentEvent["EDU URL"] && this.currentEvent["EDU URL"].trim() !== '') ? this.currentEvent["EDU URL"] : (this.currentEvent["General URL"] || '');
+            promoCode = this.currentEvent["EDU code"];
+            registrationUrl = this.currentEvent["EDU URL"];
         } else if (category === 'partner') {
-            promoCode = this.currentEvent["Partner code"] || '';
-            registrationUrl = (this.currentEvent["Partner URL"] && this.currentEvent["Partner URL"].trim() !== '') ? this.currentEvent["Partner URL"] : (this.currentEvent["General URL"] || '');
+            promoCode = this.currentEvent["Partner code"];
+            registrationUrl = this.currentEvent["Partner URL"];
         } else {
             promoCode = '';
-            registrationUrl = this.currentEvent["General URL"] || '';
+            registrationUrl = this.currentEvent["General URL"];
         }
         console.log('[DEBUG] sendEmail: category:', category, 'promoCode:', promoCode, 'registrationUrl:', registrationUrl, 'event:', this.currentEvent);
 
