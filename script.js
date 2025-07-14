@@ -47,8 +47,8 @@ class PromoCodeManager {
         const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
         const map = {};
         lines.forEach(line => {
-            const [affiliation, message, category] = line.split('|').map(s => s.trim());
-            map[affiliation] = { message, category };
+            const [affiliation, message, category, domain] = line.split('|').map(s => s.trim());
+            map[affiliation] = { message, category, domain: domain || '' };
         });
         return map;
     }
@@ -164,6 +164,13 @@ class PromoCodeManager {
             return;
         }
 
+        // Validate email domain for the selected affiliation
+        const domainValidation = this.validateEmailDomain(email, affiliation);
+        if (!domainValidation.valid) {
+            this.showError(domainValidation.message);
+            return;
+        }
+
         this.setLoading(true);
         
         try {
@@ -181,6 +188,34 @@ class PromoCodeManager {
     validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    validateEmailDomain(email, affiliation) {
+        const affiliationData = this.affiliations[affiliation];
+        debug('Domain validation', { email, affiliation, affiliationData });
+        
+        if (!affiliationData || !affiliationData.domain) {
+            // No domain requirement for this affiliation
+            debug('No domain requirement for this affiliation');
+            return { valid: true };
+        }
+
+        const requiredDomain = affiliationData.domain.toLowerCase();
+        const emailLower = email.toLowerCase();
+        
+        debug('Checking domain requirement', { requiredDomain, emailLower });
+        
+        // Check if the required domain is present in the email
+        if (!emailLower.includes(requiredDomain)) {
+            debug('Domain validation failed', { requiredDomain, emailLower });
+            return {
+                valid: false,
+                message: `For ${affiliation} affiliation, you must use an email address that contains "${requiredDomain}" in the domain.`
+            };
+        }
+        
+        debug('Domain validation passed');
+        return { valid: true };
     }
 
     async processPromoCodeRequest(email, affiliation) {

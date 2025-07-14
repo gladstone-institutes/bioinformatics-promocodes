@@ -5,6 +5,10 @@ on:
   push:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-affiliations:
     runs-on: ubuntu-latest
@@ -21,16 +25,18 @@ jobs:
               lines = [l.strip() for l in f if l.strip() and not l.startswith('#')]
               for i, line in enumerate(lines, 1):
                   parts = [p.strip() for p in line.split('|')]
-                  if len(parts) != 3:
-                      print(f'Error: Line {i} does not have 3 fields: {line}')
+                  if len(parts) != 4:
+                      print(f'Error: Line {i} does not have 4 fields (affiliation|message|category|domain): {line}')
                       sys.exit(1)
-                  aff, msg, cat = parts
+                  aff, msg, cat, domain = parts
                   if not aff or not msg or not cat:
-                      print(f'Error: Line {i} has empty fields: {line}')
+                      print(f'Error: Line {i} has empty required fields (affiliation, message, category): {line}')
                       sys.exit(1)
                   if cat not in valid_categories:
                       print(f'Error: Line {i} has invalid category: {cat}')
                       sys.exit(1)
+                  # Domain can be empty for some affiliations (like "default" category)
+                  print(f'Line {i}: {aff} -> category: {cat}, domain: "{domain}"')
           print('affiliations.txt is valid.')
           EOF
           python3 validate_affiliations.py

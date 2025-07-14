@@ -36,6 +36,7 @@
 - [ ] Add rate limiting
 
 ## Phase 5: Advanced Features 📋
+- [x] Domain validation for email addresses
 - [ ] Custom branding options
 
 ## Phase 6: Testing & Deployment ✅

@@ -1,7 +1,7 @@
-# affiliation | message | category
-Gladstone|As a Gladstone affiliate, you can register for free!|partner
-Genentech|As a Genentech affiliate, you can register for free!|partner
-UCSF|As a UCSF affiliate, you're eligible for our special academic discount!|edu
-Other academic|As an academic participant, you're eligible for our special academic discount!|edu
-Other industry|We're excited to have industry professionals join our workshop. Unfortunately, there are no promo codes available at this time.|default
-All others|We're glad to have you join our diverse community of learners. Unfortunately, there are no promo codes available at this time.|default 
+# affiliation | message | category | domain
+Gladstone|As a Gladstone affiliate, you can register for free!|partner |gladstone
+Genentech|As a Genentech affiliate, you can register for free!|partner |gene
+UCSF|As a UCSF affiliate, you're eligible for our special academic discount!|edu |ucsf
+Other academic|As an academic participant, you're eligible for our special academic discount!|edu |edu
+Other industry|We're excited to have industry professionals join our workshop. Unfortunately, there are no promo codes available at this time.|default |
+All others|We're glad to have you join our diverse community of learners. Unfortunately, there are no promo codes available at this time.|default |
