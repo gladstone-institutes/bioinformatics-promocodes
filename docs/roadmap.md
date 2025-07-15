@@ -48,5 +48,6 @@
 - [x] Add CORS headers to Google Apps Script
 - [ ] Test full deployment workflow
 - [ ] Validate email delivery
+- [x] Fix CORS preflight issues with GET-based logging
 - [x] Test request logging
 - [ ] Performance testing

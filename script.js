@@ -361,13 +361,18 @@ class PromoCodeManager {
             };
             debug('Log data being sent:', logData);
             
-            const response = await fetch(scriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(logData)
+            // Use GET request with query parameters to avoid CORS preflight
+            const queryParams = new URLSearchParams({
+                action: 'log',
+                email: logData.email,
+                affiliation: logData.affiliation,
+                eventId: logData.eventId,
+                eventTitle: logData.eventTitle,
+                promoCode: logData.promoCode,
+                registrationUrl: logData.registrationUrl
             });
+            
+            const response = await fetch(`${scriptUrl}?${queryParams}`);
             
             const result = await response.json();
             console.log('[DEBUG] logRequest: fetch result:', result);
