@@ -28,17 +28,31 @@ function getEventsData() {
 
     try {
         const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
-        const lastRow = sheet.getLastRow();
-        const lastCol = sheet.getLastColumn();
+        const lastCol = 11;
         
-        if (lastRow < 2) {
-            Logger.log('Sheet has less than 2 rows.');
+        // Read a reasonable range (let's say up to row 1000) and find the actual last row with content
+        const maxRowsToCheck = 1000;
+        const columnAData = sheet.getRange(1, 1, maxRowsToCheck, 1).getValues();
+        
+        // Find the last row with actual content in column A
+        let actualLastRow = 0;
+        for (let i = columnAData.length - 1; i >= 0; i--) {
+            if (columnAData[i][0] !== '' && columnAData[i][0] !== null && columnAData[i][0] !== undefined) {
+                actualLastRow = i + 1; // Convert to 1-based index
+                break;
+            }
+        }
+        
+        Logger.log('Actual last row with content in column A: ' + actualLastRow);
+        
+        if (actualLastRow < 2) {
+            Logger.log('Sheet has less than 2 rows with content in column A.');
             return [];
         }
         
-        // Read from row 2 (headers) to last non-empty row, all columns dynamically
-        const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-        Logger.log('Data range: row 2, col 1, numRows: ' + (lastRow - 1) + ', numCols: ' + lastCol);
+        // Read from row 2 (headers) to actual last row with content, all columns
+        const data = sheet.getRange(2, 1, actualLastRow - 1, lastCol).getValues();
+        Logger.log('Data range: row 2, col 1, numRows: ' + (actualLastRow - 1) + ', numCols: ' + lastCol);
         Logger.log('Raw data: ' + JSON.stringify(data));
         
         if (data.length === 0) {
