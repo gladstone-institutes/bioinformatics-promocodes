@@ -92,14 +92,36 @@ function getEventsData() {
 }
 
 function logRequest(requestData) {
+    Logger.log('=== logRequest CALLED ===');
+    Logger.log('Received data: ' + JSON.stringify(requestData));
+    
     const spreadsheetId = 'ADD_SHEET_ID';
     const sheetName = 'Logs';
+    
+    Logger.log('Using spreadsheet ID: ' + spreadsheetId);
+    Logger.log('Using sheet name: ' + sheetName);
 
     try {
-        const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
+        Logger.log('Attempting to open spreadsheet...');
+        const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+        Logger.log('Spreadsheet opened successfully: ' + spreadsheet.getName());
+        
+        Logger.log('Attempting to get sheet: ' + sheetName);
+        const sheet = spreadsheet.getSheetByName(sheetName);
+        
+        if (!sheet) {
+            Logger.log('ERROR: Sheet "' + sheetName + '" not found!');
+            Logger.log('Available sheets: ' + spreadsheet.getSheets().map(s => s.getName()).join(', '));
+            throw new Error('Sheet "' + sheetName + '" not found');
+        }
+        
+        Logger.log('Sheet found successfully');
+        const lastRow = sheet.getLastRow();
+        Logger.log('Current last row: ' + lastRow);
         
         // Check if this is the first log entry and add headers if needed
-        if (sheet.getLastRow() === 0) {
+        if (lastRow === 0) {
+            Logger.log('Sheet is empty, adding headers...');
             const headers = [
                 'Timestamp',
                 'Email',
@@ -110,6 +132,7 @@ function logRequest(requestData) {
                 'Registration URL'
             ];
             sheet.appendRow(headers);
+            Logger.log('Headers added: ' + JSON.stringify(headers));
         }
         
         const timestamp = new Date().toISOString();
@@ -122,10 +145,17 @@ function logRequest(requestData) {
             requestData.promoCode || '',
             requestData.registrationUrl || ''
         ];
+        
+        Logger.log('Preparing to append row: ' + JSON.stringify(logRow));
         sheet.appendRow(logRow);
-        Logger.log('Logged request: ' + JSON.stringify(logRow));
+        Logger.log('Row appended successfully!');
+        Logger.log('New last row: ' + sheet.getLastRow());
+        
     } catch (error) {
-        Logger.log('Error logging request: ' + error);
+        Logger.log('=== ERROR IN logRequest ===');
+        Logger.log('Error message: ' + error.message);
+        Logger.log('Error stack: ' + error.stack);
         console.error('Error logging request:', error);
+        throw error; // Re-throw so the calling function knows it failed
     }
 }

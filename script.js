@@ -372,7 +372,10 @@ class PromoCodeManager {
                 registrationUrl: logData.registrationUrl
             });
             
-            const response = await fetch(`${scriptUrl}?${queryParams}`);
+            const logUrl = `${scriptUrl}?${queryParams}`;
+            console.log('[DEBUG] Logging URL:', logUrl);
+            
+            const response = await fetch(logUrl);
             
             const result = await response.json();
             console.log('[DEBUG] logRequest: fetch result:', result);
