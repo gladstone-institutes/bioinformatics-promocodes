@@ -5,17 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gladstone Bioinformatics Workshop Promo Codes</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Gladstone Bioinformatics Workshop Promo Codes</h1>
-            <p>Access exclusive promo codes and registration links for upcoming events</p>
-        </header>
+    <header class="header">
+        <div class="header-content">
+            <img src="GladstoneLogoWh.png" alt="Gladstone Institutes" class="logo">
+            <div class="header-text">
+                <h1>Bioinformatics Workshop Promo Codes</h1>
+                <p>Access exclusive promo codes and registration links for upcoming events</p>
+            </div>
+        </div>
+    </header>
 
+    <div class="container">
         <main>
-            <div class="form-container">
+            <div class="card">
+                <h2>Request Your Promo Code</h2>
                 <form id="promoForm">
                     <div class="form-group">
                         <label for="eventSelect">Select Upcoming Event:</label>
@@ -36,32 +42,33 @@
                         <input type="email" id="email" required placeholder="your.email@institution.edu">
                     </div>
 
-                    <button type="submit" id="submitBtn">
+                    <button type="submit" id="submitBtn" class="btn btn-primary">
                         <span class="btn-text">Get Promo Code</span>
-                        <span class="btn-loading" style="display: none;">Sending...</span>
+                        <span class="btn-loading" style="display: none;">
+                            <div class="spinner"></div>
+                            Sending...
+                        </span>
                     </button>
                 </form>
             </div>
 
-            <div id="result" class="result-container" style="display: none;">
-                <div class="success-message">
-                    <h3>✅ Promo Code Sent!</h3>
-                    <p>Check your email for your exclusive promo code and registration link.</p>
-                </div>
+            <div id="result" class="card success hidden">
+                <div class="success-icon">✓</div>
+                <h3>Promo Code Sent!</h3>
+                <p>Check your email for your exclusive promo code and registration link.</p>
             </div>
 
-            <div id="error" class="error-container" style="display: none;">
-                <div class="error-message">
-                    <h3>❌ Error</h3>
-                    <p id="errorText"></p>
-                </div>
+            <div id="error" class="card hidden">
+                <div style="color: #F76912; font-size: 2rem; text-align: center; margin-bottom: 1rem;">⚠</div>
+                <h3 style="color: #F76912; text-align: center; margin-bottom: 1rem;">Error</h3>
+                <p id="errorText" style="text-align: center; color: #8A9394;"></p>
             </div>
         </main>
-
-        <footer>
-            <p>&copy; 2025 Gladstone Bioinformatics Core</p>
-        </footer>
     </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Gladstone Bioinformatics Core</p>
+    </footer>
 
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>

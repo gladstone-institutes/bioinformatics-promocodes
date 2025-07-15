@@ -365,7 +365,7 @@ class PromoCodeManager {
         if (loading) {
             submitBtn.disabled = true;
             btnText.style.display = 'none';
-            btnLoading.style.display = 'inline';
+            btnLoading.style.display = 'flex';
         } else {
             submitBtn.disabled = false;
             btnText.style.display = 'inline';
@@ -374,16 +374,16 @@ class PromoCodeManager {
     }
 
     showSuccess() {
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('error').style.display = 'none';
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('error').classList.add('hidden');
         document.getElementById('promoForm').reset();
         this.currentEvent = null;
     }
 
     showError(message) {
         document.getElementById('errorText').textContent = message;
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('result').classList.add('hidden');
     }
 }
 

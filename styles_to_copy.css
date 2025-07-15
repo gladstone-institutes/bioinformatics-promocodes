@@ -122,7 +122,6 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
-    width: 100%;
 }
 
 .btn-primary {
@@ -139,13 +138,6 @@ body {
 
 .btn-primary:active {
     transform: translateY(0);
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    background: #8A9394;
 }
 
 .btn-secondary {
@@ -167,15 +159,13 @@ body {
 }
 
 .spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #D5E4E5;
-    border-top: 2px solid #ffffff;
+    width: 50px;
+    height: 50px;
+    border: 4px solid #D5E4E5;
+    border-top: 4px solid #F76912;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    display: inline-block;
-    margin-right: 0.5rem;
-    vertical-align: middle;
+    margin: 0 auto 1rem;
 }
 
 @keyframes spin {
@@ -183,10 +173,13 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-.btn-loading {
-    display: none;
-    align-items: center;
-    justify-content: center;
+.loading h3 {
+    color: #002A40;
+    margin-bottom: 0.5rem;
+}
+
+.loading p {
+    color: #8A9394;
 }
 
 /* Success message */
@@ -206,7 +199,6 @@ body {
     margin: 0 auto 1.5rem;
     font-size: 2rem;
     color: white;
-    font-weight: bold;
 }
 
 .success h3 {
