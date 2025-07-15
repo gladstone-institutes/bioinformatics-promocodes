@@ -135,8 +135,13 @@ class PromoCodeManager {
 
     handleEventChange(event) {
         const eventId = event.target.value;
+        console.log('[DEBUG] Event change - eventId:', eventId);
+        console.log('[DEBUG] Event change - available events:', this.events);
+        
         // Find by EDU code or fallback to Title or index
         this.currentEvent = this.events.find(e => e["EDU code"] === eventId || e["Title"] === eventId);
+        console.log('[DEBUG] Event change - found event:', this.currentEvent);
+        
         debug('Event selected', this.currentEvent);
     }
 
@@ -147,9 +152,17 @@ class PromoCodeManager {
         const email = formData.get('email') || document.getElementById('email').value;
         const affiliation = formData.get('affiliation') || document.getElementById('affiliation').value;
         
+        // Debug event selection
+        const eventSelect = document.getElementById('eventSelect');
+        const selectedEventId = eventSelect.value;
+        console.log('[DEBUG] Form submission - selected event ID:', selectedEventId);
+        console.log('[DEBUG] Form submission - this.currentEvent:', this.currentEvent);
+        console.log('[DEBUG] Form submission - available events:', this.events);
+        
         debug('Form submission', { email, affiliation, event: this.currentEvent });
 
         if (!this.currentEvent) {
+            console.log('[DEBUG] No event selected - showing error');
             this.showError('Please select an event.');
             return;
         }
@@ -176,11 +189,10 @@ class PromoCodeManager {
         try {
             console.log('[DEBUG] Starting promo code request process...');
             await this.processPromoCodeRequest(email, affiliation);
-            console.log('[DEBUG] Promo code request successful, showing success message...');
-            this.showSuccess();
-            console.log('[DEBUG] Starting logging request...');
+            console.log('[DEBUG] Promo code request successful, starting logging...');
             await this.logRequest(email, affiliation);
-            console.log('[DEBUG] Logging request completed successfully');
+            console.log('[DEBUG] Logging request completed successfully, showing success message...');
+            this.showSuccess();
         } catch (error) {
             console.log('[DEBUG] Error in promo code process:', error);
             debug('Error processing request', error);
