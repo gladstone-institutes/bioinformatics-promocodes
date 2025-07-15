@@ -1,29 +1,5 @@
 function doGet(e) {
-    // Check if this is a logging request
-    if (e.parameter && e.parameter.action === 'log') {
-        try {
-            const logData = {
-                email: e.parameter.email || '',
-                affiliation: e.parameter.affiliation || '',
-                eventId: e.parameter.eventId || '',
-                eventTitle: e.parameter.eventTitle || '',
-                promoCode: e.parameter.promoCode || '',
-                registrationUrl: e.parameter.registrationUrl || ''
-            };
-            writeToLogsSheet(logData);
-            return ContentService.createTextOutput(JSON.stringify({
-                'status': 'success',
-                'message': 'Request logged successfully'
-            })).setMimeType(ContentService.MimeType.JSON);
-        } catch (error) {
-            return ContentService.createTextOutput(JSON.stringify({
-                'status': 'error',
-                'message': error.toString()
-            })).setMimeType(ContentService.MimeType.JSON);
-        }
-    }
-    
-    // Default behavior - return events data
+    // GET requests are for reading data - return events
     return ContentService.createTextOutput(JSON.stringify({
         'status': 'success',
         'data': getEventsData()
@@ -31,14 +7,19 @@ function doGet(e) {
 }
 
 function doPost(e) {
+    Logger.log('=== doPost CALLED ===');
+    Logger.log('POST data received: ' + e.postData.contents);
+    
     try {
         const data = JSON.parse(e.postData.contents);
-        logRequest(data);
+        Logger.log('Parsed data: ' + JSON.stringify(data));
+        writeToLogsSheet(data);
         return ContentService.createTextOutput(JSON.stringify({
             'status': 'success',
             'message': 'Request logged successfully'
         })).setMimeType(ContentService.MimeType.JSON);
     } catch (error) {
+        Logger.log('Error in doPost: ' + error.toString());
         return ContentService.createTextOutput(JSON.stringify({
             'status': 'error',
             'message': error.toString()

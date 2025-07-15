@@ -361,21 +361,13 @@ class PromoCodeManager {
             };
             debug('Log data being sent:', logData);
             
-            // Use GET request with query parameters to avoid CORS preflight
-            const queryParams = new URLSearchParams({
-                action: 'log',
-                email: logData.email,
-                affiliation: logData.affiliation,
-                eventId: logData.eventId,
-                eventTitle: logData.eventTitle,
-                promoCode: logData.promoCode,
-                registrationUrl: logData.registrationUrl
+            // Use POST request for logging (proper HTTP method for writing data)
+            console.log('[DEBUG] Sending POST request to log data');
+            
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                body: JSON.stringify(logData)
             });
-            
-            const logUrl = `${scriptUrl}?${queryParams}`;
-            console.log('[DEBUG] Logging URL:', logUrl);
-            
-            const response = await fetch(logUrl);
             
             const result = await response.json();
             console.log('[DEBUG] logRequest: fetch result:', result);
