@@ -35,7 +35,14 @@ Create a tab called "Logs". **Note: You don't need to add column headers manuall
 - **F1**: Promo Code
 - **G1**: Registration URL
 
-### 1.4 Get Spreadsheet ID
+### 1.4 Set up Domain Validation (Optional)
+The system includes email domain validation based on affiliation. The domain validation requires the specified domain to appear as a **complete word** in the email domain (not in the username or as part of another word). For example:
+- ✅ `user@gladstone.org` (valid for Gladstone)
+- ✅ `user@subdomain.gladstone.edu` (valid for Gladstone)
+- ❌ `gladstone@gmail.com` (invalid - "gladstone" is in username, not domain)
+- ❌ `user@mygladstone.org` (invalid - "gladstone" is part of "mygladstone", not a complete word)
+
+### 1.5 Get Spreadsheet ID
 1. Click "Share" in the top right
 2. Copy the URL
 3. Extract the ID from the URL: `https://docs.google.com/spreadsheets/d/`**`YOUR_SPREADSHEET_ID`**`/edit`

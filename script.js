@@ -203,14 +203,29 @@ class PromoCodeManager {
         const requiredDomain = affiliationData.domain.toLowerCase();
         const emailLower = email.toLowerCase();
         
-        debug('Checking domain requirement', { requiredDomain, emailLower });
-        
-        // Check if the required domain is present in the email
-        if (!emailLower.includes(requiredDomain)) {
-            debug('Domain validation failed', { requiredDomain, emailLower });
+        // Extract the domain part (everything after @)
+        const atIndex = emailLower.indexOf('@');
+        if (atIndex === -1) {
+            debug('Invalid email format - no @ symbol');
             return {
                 valid: false,
-                message: `For ${affiliation} affiliation, you must use an email address that contains "${requiredDomain}" in the domain.`
+                message: 'Invalid email format.'
+            };
+        }
+        
+        const domainPart = emailLower.substring(atIndex + 1);
+        debug('Checking domain requirement', { requiredDomain, emailLower, domainPart });
+        
+        // Check if the required domain appears as a whole word in the domain part
+        // Split domain by dots and check each part
+        const domainParts = domainPart.split('.');
+        const hasRequiredDomain = domainParts.some(part => part === requiredDomain);
+        
+        if (!hasRequiredDomain) {
+            debug('Domain validation failed', { requiredDomain, domainPart, domainParts });
+            return {
+                valid: false,
+                message: `For ${affiliation} affiliation, you must use an email address with "${requiredDomain}" as part of the domain.`
             };
         }
         
