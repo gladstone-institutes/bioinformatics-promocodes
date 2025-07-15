@@ -174,10 +174,15 @@ class PromoCodeManager {
         this.setLoading(true);
         
         try {
+            console.log('[DEBUG] Starting promo code request process...');
             await this.processPromoCodeRequest(email, affiliation);
+            console.log('[DEBUG] Promo code request successful, showing success message...');
             this.showSuccess();
+            console.log('[DEBUG] Starting logging request...');
             await this.logRequest(email, affiliation);
+            console.log('[DEBUG] Logging request completed successfully');
         } catch (error) {
+            console.log('[DEBUG] Error in promo code process:', error);
             debug('Error processing request', error);
             this.showError('Failed to process your request. Please try again.');
         } finally {
@@ -303,12 +308,16 @@ class PromoCodeManager {
     }
 
     async logRequest(email, affiliation) {
+        console.log('[DEBUG] logRequest called with:', { email, affiliation, event: this.currentEvent });
         debug('Logging request to Google Apps Script', { email, affiliation, event: this.currentEvent });
         
         // Use injected config from GitHub secrets
         const scriptUrl = window.APP_CONFIG?.GOOGLE_SHEETS?.APPS_SCRIPT_URL;
+        console.log('[DEBUG] Apps Script URL from config:', scriptUrl);
+        console.log('[DEBUG] Full APP_CONFIG:', window.APP_CONFIG);
         
         if (!scriptUrl || scriptUrl === 'YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_URL') {
+            console.log('[DEBUG] Apps Script URL not configured, skipping log');
             debug('Apps Script URL not configured, skipping log');
             return;
         }
