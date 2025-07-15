@@ -135,13 +135,8 @@ class PromoCodeManager {
 
     handleEventChange(event) {
         const eventId = event.target.value;
-        console.log('[DEBUG] Event change - eventId:', eventId);
-        console.log('[DEBUG] Event change - available events:', this.events);
-        
         // Find by EDU code or fallback to Title or index
         this.currentEvent = this.events.find(e => e["EDU code"] === eventId || e["Title"] === eventId);
-        console.log('[DEBUG] Event change - found event:', this.currentEvent);
-        
         debug('Event selected', this.currentEvent);
     }
 
@@ -152,17 +147,9 @@ class PromoCodeManager {
         const email = formData.get('email') || document.getElementById('email').value;
         const affiliation = formData.get('affiliation') || document.getElementById('affiliation').value;
         
-        // Debug event selection
-        const eventSelect = document.getElementById('eventSelect');
-        const selectedEventId = eventSelect.value;
-        console.log('[DEBUG] Form submission - selected event ID:', selectedEventId);
-        console.log('[DEBUG] Form submission - this.currentEvent:', this.currentEvent);
-        console.log('[DEBUG] Form submission - available events:', this.events);
-        
         debug('Form submission', { email, affiliation, event: this.currentEvent });
 
         if (!this.currentEvent) {
-            console.log('[DEBUG] No event selected - showing error');
             this.showError('Please select an event.');
             return;
         }
@@ -187,14 +174,10 @@ class PromoCodeManager {
         this.setLoading(true);
         
         try {
-            console.log('[DEBUG] Starting promo code request process...');
             await this.processPromoCodeRequest(email, affiliation);
-            console.log('[DEBUG] Promo code request successful, starting logging...');
             await this.logRequest(email, affiliation);
-            console.log('[DEBUG] Logging request completed successfully, showing success message...');
             this.showSuccess();
         } catch (error) {
-            console.log('[DEBUG] Error in promo code process:', error);
             debug('Error processing request', error);
             this.showError('Failed to process your request. Please try again.');
         } finally {
@@ -320,16 +303,12 @@ class PromoCodeManager {
     }
 
     async logRequest(email, affiliation) {
-        console.log('[DEBUG] logRequest called with:', { email, affiliation, event: this.currentEvent });
         debug('Logging request to Google Apps Script', { email, affiliation, event: this.currentEvent });
         
         // Use injected config from GitHub secrets
         const scriptUrl = window.APP_CONFIG?.GOOGLE_SHEETS?.APPS_SCRIPT_URL;
-        console.log('[DEBUG] Apps Script URL from config:', scriptUrl);
-        console.log('[DEBUG] Full APP_CONFIG:', window.APP_CONFIG);
         
         if (!scriptUrl || scriptUrl === 'YOUR_GOOGLE_APPS_SCRIPT_DEPLOYMENT_URL') {
-            console.log('[DEBUG] Apps Script URL not configured, skipping log');
             debug('Apps Script URL not configured, skipping log');
             return;
         }
@@ -349,7 +328,6 @@ class PromoCodeManager {
                 promoCode = '';
                 registrationUrl = this.currentEvent["General URL"] || '';
             }
-            console.log('[DEBUG] logRequest: category:', category, 'promoCode:', promoCode, 'registrationUrl:', registrationUrl, 'event:', this.currentEvent);
 
             const logData = {
                 email: email,
@@ -362,15 +340,12 @@ class PromoCodeManager {
             debug('Log data being sent:', logData);
             
             // Use POST request for logging (proper HTTP method for writing data)
-            console.log('[DEBUG] Sending POST request to log data');
-            
             const response = await fetch(scriptUrl, {
                 method: 'POST',
                 body: JSON.stringify(logData)
             });
             
             const result = await response.json();
-            console.log('[DEBUG] logRequest: fetch result:', result);
             if (result.status === 'success') {
                 debug('Request logged successfully');
             } else {
@@ -378,7 +353,6 @@ class PromoCodeManager {
             }
         } catch (error) {
             debug('Error logging request', error);
-            console.error('[DEBUG] logRequest error:', error);
             // Don't show error to user for logging failures
         }
     }

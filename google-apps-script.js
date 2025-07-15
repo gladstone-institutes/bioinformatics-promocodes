@@ -7,19 +7,14 @@ function doGet(e) {
 }
 
 function doPost(e) {
-    Logger.log('=== doPost CALLED ===');
-    Logger.log('POST data received: ' + e.postData.contents);
-    
     try {
         const data = JSON.parse(e.postData.contents);
-        Logger.log('Parsed data: ' + JSON.stringify(data));
         writeToLogsSheet(data);
         return ContentService.createTextOutput(JSON.stringify({
             'status': 'success',
             'message': 'Request logged successfully'
         })).setMimeType(ContentService.MimeType.JSON);
     } catch (error) {
-        Logger.log('Error in doPost: ' + error.toString());
         return ContentService.createTextOutput(JSON.stringify({
             'status': 'error',
             'message': error.toString()
@@ -73,36 +68,14 @@ function getEventsData() {
 }
 
 function writeToLogsSheet(requestData) {
-    Logger.log('=== writeToLogsSheet CALLED ===');
-    Logger.log('Received data: ' + JSON.stringify(requestData));
-    
     const spreadsheetId = 'ADD_SHEET_ID';
     const sheetName = 'Logs';
-    
-    Logger.log('Using spreadsheet ID: ' + spreadsheetId);
-    Logger.log('Using sheet name: ' + sheetName);
 
     try {
-        Logger.log('Attempting to open spreadsheet...');
-        const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
-        Logger.log('Spreadsheet opened successfully: ' + spreadsheet.getName());
-        
-        Logger.log('Attempting to get sheet: ' + sheetName);
-        const sheet = spreadsheet.getSheetByName(sheetName);
-        
-        if (!sheet) {
-            Logger.log('ERROR: Sheet "' + sheetName + '" not found!');
-            Logger.log('Available sheets: ' + spreadsheet.getSheets().map(s => s.getName()).join(', '));
-            throw new Error('Sheet "' + sheetName + '" not found');
-        }
-        
-        Logger.log('Sheet found successfully');
-        const lastRow = sheet.getLastRow();
-        Logger.log('Current last row: ' + lastRow);
+        const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
         
         // Check if this is the first log entry and add headers if needed
-        if (lastRow === 0) {
-            Logger.log('Sheet is empty, adding headers...');
+        if (sheet.getLastRow() === 0) {
             const headers = [
                 'Timestamp',
                 'Email',
@@ -113,7 +86,6 @@ function writeToLogsSheet(requestData) {
                 'Registration URL'
             ];
             sheet.appendRow(headers);
-            Logger.log('Headers added: ' + JSON.stringify(headers));
         }
         
         const timestamp = new Date().toISOString();
@@ -126,17 +98,10 @@ function writeToLogsSheet(requestData) {
             requestData.promoCode || '',
             requestData.registrationUrl || ''
         ];
-        
-        Logger.log('Preparing to append row: ' + JSON.stringify(logRow));
         sheet.appendRow(logRow);
-        Logger.log('Row appended successfully!');
-        Logger.log('New last row: ' + sheet.getLastRow());
         
     } catch (error) {
-        Logger.log('=== ERROR IN writeToLogsSheet ===');
-        Logger.log('Error message: ' + error.message);
-        Logger.log('Error stack: ' + error.stack);
+        Logger.log('Error logging request: ' + error);
         console.error('Error logging request:', error);
-        throw error; // Re-throw so the calling function knows it failed
     }
 }
