@@ -44,7 +44,9 @@
 - [x] Fix Partner URL column reading issue
 - [x] Fix logging data mismatch between frontend and backend
 - [x] Add automatic header creation for Logs sheet
+- [x] Fix logging sequence issue (currentEvent null)
+- [x] Add CORS headers to Google Apps Script
 - [ ] Test full deployment workflow
 - [ ] Validate email delivery
-- [ ] Test request logging
+- [x] Test request logging
 - [ ] Performance testing

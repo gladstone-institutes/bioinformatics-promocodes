@@ -193,6 +193,7 @@ console.log(window.APP_CONFIG);
 - **Wrong spreadsheet ID**: Verify the ID in your Apps Script matches your Google Sheet
 - **Apps Script not deployed**: Make sure you've deployed the script as a web app
 - **Permission issues**: Apps Script needs permission to write to the sheet
+- **CORS errors**: Make sure your Apps Script includes CORS headers (handled automatically in the provided code)
 
 ## Next Steps
 

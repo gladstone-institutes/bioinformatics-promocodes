@@ -1,23 +1,62 @@
 function doGet(e) {
-    return ContentService.createTextOutput(JSON.stringify({
+    const output = ContentService.createTextOutput(JSON.stringify({
         'status': 'success',
         'data': getEventsData()
     })).setMimeType(ContentService.MimeType.JSON);
+    
+    // Add CORS headers
+    output.setHeaders({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    
+    return output;
+}
+
+function doOptions(e) {
+    // Handle preflight CORS requests
+    const output = ContentService.createTextOutput('');
+    output.setHeaders({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '86400'
+    });
+    return output;
 }
 
 function doPost(e) {
     try {
         const data = JSON.parse(e.postData.contents);
         logRequest(data);
-        return ContentService.createTextOutput(JSON.stringify({
+        const output = ContentService.createTextOutput(JSON.stringify({
             'status': 'success',
             'message': 'Request logged successfully'
         })).setMimeType(ContentService.MimeType.JSON);
+        
+        // Add CORS headers
+        output.setHeaders({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        });
+        
+        return output;
     } catch (error) {
-        return ContentService.createTextOutput(JSON.stringify({
+        const output = ContentService.createTextOutput(JSON.stringify({
             'status': 'error',
             'message': error.toString()
         })).setMimeType(ContentService.MimeType.JSON);
+        
+        // Add CORS headers even for errors
+        output.setHeaders({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        });
+        
+        return output;
     }
 }
 
