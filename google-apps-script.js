@@ -10,7 +10,7 @@ function doGet(e) {
                 promoCode: e.parameter.promoCode || '',
                 registrationUrl: e.parameter.registrationUrl || ''
             };
-            logRequest(logData);
+            writeToLogsSheet(logData);
             return ContentService.createTextOutput(JSON.stringify({
                 'status': 'success',
                 'message': 'Request logged successfully'
@@ -91,8 +91,8 @@ function getEventsData() {
     }
 }
 
-function logRequest(requestData) {
-    Logger.log('=== logRequest CALLED ===');
+function writeToLogsSheet(requestData) {
+    Logger.log('=== writeToLogsSheet CALLED ===');
     Logger.log('Received data: ' + JSON.stringify(requestData));
     
     const spreadsheetId = 'ADD_SHEET_ID';
@@ -152,7 +152,7 @@ function logRequest(requestData) {
         Logger.log('New last row: ' + sheet.getLastRow());
         
     } catch (error) {
-        Logger.log('=== ERROR IN logRequest ===');
+        Logger.log('=== ERROR IN writeToLogsSheet ===');
         Logger.log('Error message: ' + error.message);
         Logger.log('Error stack: ' + error.stack);
         console.error('Error logging request:', error);
