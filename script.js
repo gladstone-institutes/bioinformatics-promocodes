@@ -96,6 +96,10 @@ class PromoCodeManager {
             if (result.status === 'success') {
                 this.events = result.data;
                 debug('Events loaded from Apps Script', this.events.length);
+                
+                // Filter out incomplete events as a client-side backup
+                this.events = this.filterCompleteEvents(this.events);
+                debug('Complete events after filtering', this.events.length);
             } else {
                 console.error('[DEBUG] Failed to load events from Apps Script:', result);
                 throw new Error('Failed to load events from Apps Script');
@@ -123,6 +127,25 @@ class PromoCodeManager {
             option.textContent = `${event["Title"] || "Untitled Event"}${dateStr}`;
             select.appendChild(option);
         });
+    }
+
+    filterCompleteEvents(events) {
+        // Define required columns that must have values for an event to be included
+        const requiredColumns = ['Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'];
+        
+        const completeEvents = events.filter(event => {
+            // Check if all required columns have non-empty values
+            for (const column of requiredColumns) {
+                if (!event[column] || String(event[column]).trim() === '') {
+                    console.log(`[DEBUG] Event excluded - missing/empty column "${column}":`, event);
+                    return false;
+                }
+            }
+            return true;
+        });
+        
+        console.log(`[DEBUG] Events filtered: ${events.length} → ${completeEvents.length} complete events`);
+        return completeEvents;
     }
 
     setupEventListeners() {

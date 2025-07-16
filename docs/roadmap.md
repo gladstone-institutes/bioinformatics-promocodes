@@ -49,6 +49,7 @@
 - [x] Implement proper POST-based logging architecture
 - [x] Test request logging
 - [x] Clean up debugging code
+- [x] Add validation to exclude incomplete rows from dropdown (server-side and client-side)
 - [ ] Test full deployment workflow
 - [ ] Validate email delivery
 - [ ] Performance testing

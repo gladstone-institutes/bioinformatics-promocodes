@@ -31,7 +31,7 @@ function getEventsData() {
         const lastCol = 11;
         
         // Read a reasonable range (let's say up to row 1000) and find the actual last row with content
-        const maxRowsToCheck = 1000;
+        const maxRowsToCheck = 50;
         const columnAData = sheet.getRange(1, 1, maxRowsToCheck, 1).getValues();
         
         // Find the last row with actual content in column A
@@ -63,16 +63,34 @@ function getEventsData() {
         const headers = data[0];
         Logger.log('Headers: ' + JSON.stringify(headers));
         
+        // Define required columns that must have values for an event to be included
+        const requiredColumns = ['Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'];
+        
         const events = [];
         for (let i = 1; i < data.length; i++) {
             const row = data[i];
             if (row.every(cell => cell === '' || cell === null)) continue;
+            
             const event = {};
             headers.forEach((header, index) => {
                 event[header] = row[index];
             });
-            events.push(event);
+            
+            // Check if all required columns have non-empty values
+            let isComplete = true;
+            for (const column of requiredColumns) {
+                if (!event[column] || String(event[column]).trim() === '') {
+                    isComplete = false;
+                    Logger.log('Event excluded - missing/empty column "' + column + '": ' + JSON.stringify(event));
+                    break;
+                }
+            }
+            
+            if (isComplete) {
+                events.push(event);
+            }
         }
+        Logger.log('Complete events included: ' + events.length);
         Logger.log('Events: ' + JSON.stringify(events));
         return events;
     } catch (error) {
