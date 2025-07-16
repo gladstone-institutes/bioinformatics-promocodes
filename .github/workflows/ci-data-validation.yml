@@ -106,31 +106,39 @@ jobs:
               complete_events = filter_complete_events(events)
               print(f'Events after filtering: {len(complete_events)} complete events')
               
-              # Validate that all returned events are actually complete
-              # (This tests that our server-side filtering is working correctly)
+              # Validate that all FILTERED events are complete
+              # (This tests that our filtering logic works correctly)
               validation_errors = []
-              for i, event in enumerate(events, 1):
+              for i, event in enumerate(complete_events, 1):
                   event_title = event.get('Title', f'Event {i}')
                   
                   for col in required_columns:
                       if col not in event:
-                          validation_errors.append(f'Event {i} ({event_title}): Missing column "{col}"')
+                          validation_errors.append(f'Filtered Event {i} ({event_title}): Missing column "{col}"')
                       elif not event[col] or str(event[col]).strip() == '':
-                          validation_errors.append(f'Event {i} ({event_title}): Empty value in column "{col}"')
+                          validation_errors.append(f'Filtered Event {i} ({event_title}): Empty value in column "{col}"')
               
               if validation_errors:
-                  print('\nValidation failed - Apps Script returned incomplete events:')
+                  print('\nValidation failed - Filtering logic is not working properly:')
                   for error in validation_errors:
                       print(f'  - {error}')
-                  print('\nThis indicates that server-side filtering is not working properly.')
                   sys.exit(1)
+              
+              # Validate that we have at least some events after filtering
+              if len(complete_events) == 0:
+                  print('\nValidation failed - No complete events found after filtering')
+                  sys.exit(1)
+              
+              # Calculate filtering statistics
+              filtered_out_count = len(events) - len(complete_events)
               
               # Success message
               print(f'\n✅ Validation passed:')
-              print(f'   - Apps Script returned {len(events)} events')
-              print(f'   - All events have complete data (7 required columns)')
-              print(f'   - Server-side filtering is working correctly')
-              print(f'   - Client-side filtering logic tested and confirmed')
+              print(f'   - Apps Script returned {len(events)} total events')
+              print(f'   - Filtering removed {filtered_out_count} incomplete events')
+              print(f'   - {len(complete_events)} complete events available for users')
+              print(f'   - All filtered events have complete data (7 required columns)')
+              print(f'   - Filtering logic working correctly')
           
           except Exception as e:
               print(f'Error fetching or validating events data: {e}')

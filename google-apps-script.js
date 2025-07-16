@@ -30,7 +30,7 @@ function getEventsData() {
         const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
         const lastCol = 11;
         
-        // Read a reasonable range (let's say up to row 1000) and find the actual last row with content
+        // Read a reasonable range and find the actual last row with content
         const maxRowsToCheck = 50;
         const columnAData = sheet.getRange(1, 1, maxRowsToCheck, 1).getValues();
         
@@ -50,24 +50,25 @@ function getEventsData() {
             return [];
         }
         
-        // Read from row 2 (headers) to actual last row with content, all columns
-        const data = sheet.getRange(2, 1, actualLastRow - 1, lastCol).getValues();
-        Logger.log('Data range: row 2, col 1, numRows: ' + (actualLastRow - 1) + ', numCols: ' + lastCol);
-        Logger.log('Raw data: ' + JSON.stringify(data));
+        // Read headers separately (row 2)
+        const headers = sheet.getRange(2, 1, 1, lastCol).getValues()[0];
+        Logger.log('Headers: ' + JSON.stringify(headers));
         
-        if (data.length === 0) {
-            Logger.log('No data rows found.');
+        // Read data rows (starting from row 3 to avoid header confusion)
+        if (actualLastRow < 3) {
+            Logger.log('Sheet has no data rows (only headers).');
             return [];
         }
         
-        const headers = data[0];
-        Logger.log('Headers: ' + JSON.stringify(headers));
+        const data = sheet.getRange(3, 1, actualLastRow - 2, lastCol).getValues();
+        Logger.log('Data range: row 3, col 1, numRows: ' + (actualLastRow - 2) + ', numCols: ' + lastCol);
+        Logger.log('Raw data: ' + JSON.stringify(data));
         
         // Define required columns that must have values for an event to be included
         const requiredColumns = ['Title', 'Date', 'EDU code', 'Partner code', 'General URL', 'EDU URL', 'Partner URL'];
         
         const events = [];
-        for (let i = 1; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             const row = data[i];
             if (row.every(cell => cell === '' || cell === null)) continue;
             
