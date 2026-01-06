@@ -291,7 +291,9 @@ class PromoCodeManager {
             promoCode = this.currentEvent["Partner code"];
             registrationUrl = this.currentEvent["Partner URL"];
         } else {
-            promoCode = '';
+            // For default category, no promo code is available
+            // Send a placeholder instead of empty string to avoid EmailJS validation errors
+            promoCode = 'N/A - No promo code required';
             registrationUrl = this.currentEvent["General URL"];
         }
         console.log('[DEBUG] sendEmail: category:', category, 'promoCode:', promoCode, 'registrationUrl:', registrationUrl, 'event:', this.currentEvent);
@@ -305,15 +307,43 @@ class PromoCodeManager {
             to_email: email
         };
         
+        // Enhanced logging to debug 412 errors
+        console.log('[DEBUG] ===== EmailJS Send Attempt =====');
+        console.log('[DEBUG] Service ID:', serviceId);
+        console.log('[DEBUG] Template ID:', templateId);
+        console.log('[DEBUG] API Key present:', !!apiKey, apiKey ? `${apiKey.substring(0, 10)}...` : 'MISSING');
+        console.log('[DEBUG] Template Parameters:', templateParams);
+        console.log('[DEBUG] Parameter values:');
+        console.log('  - event_title:', templateParams.event_title, `(type: ${typeof templateParams.event_title}, length: ${String(templateParams.event_title).length})`);
+        console.log('  - promo_code:', templateParams.promo_code, `(type: ${typeof templateParams.promo_code}, length: ${String(templateParams.promo_code).length})`);
+        console.log('  - registration_url:', templateParams.registration_url, `(type: ${typeof templateParams.registration_url}, length: ${String(templateParams.registration_url).length})`);
+        console.log('  - affiliation_message:', templateParams.affiliation_message, `(type: ${typeof templateParams.affiliation_message}, length: ${String(templateParams.affiliation_message).length})`);
+        console.log('  - to_email:', templateParams.to_email, `(type: ${typeof templateParams.to_email}, length: ${String(templateParams.to_email).length})`);
+        console.log('[DEBUG] =================================');
+        
         debug('EmailJS template parameters', templateParams);
         
         try {
             const response = await emailjs.send(serviceId, templateId, templateParams);
+            console.log('[DEBUG] EmailJS send SUCCESS:', response);
             debug('Email sent successfully', response);
             return response;
         } catch (error) {
+            console.error('[DEBUG] ===== EmailJS Error Details =====');
+            console.error('[DEBUG] Error object:', error);
+            console.error('[DEBUG] Error status:', error.status);
+            console.error('[DEBUG] Error statusText:', error.statusText);
+            console.error('[DEBUG] Error text:', error.text);
+            console.error('[DEBUG] Error message:', error.message);
+            console.error('[DEBUG] Error response:', error.response);
+            if (error.response) {
+                console.error('[DEBUG] Error response text:', error.response.text);
+                console.error('[DEBUG] Error response data:', error.response.data);
+            }
+            console.error('[DEBUG] Full error stringified:', JSON.stringify(error, null, 2));
+            console.error('[DEBUG] ===================================');
             debug('Email send failed', error);
-            throw new Error(`Failed to send email: ${error.text || error.message}`);
+            throw new Error(`Failed to send email: ${error.text || error.message || 'Unknown error'}`);
         }
     }
 
